@@ -8,9 +8,10 @@ output:
     toc: true
     toc_depth: 3
     fig_caption: yes
-
 fontsize: 14pt
 bibliography: bibtex.bib
+editor_options: 
+  chunk_output_type: console
 ---
 <!--
 %% \VignetteEngine{knitr::rmarkdown}
@@ -77,11 +78,13 @@ Getting Started
 Installation
 ------------
 
-The R software for running bioassayR can be downloaded from CRAN (<http://cran.at.r-project.org/>). The *bioassayR* package can be installed from R using the *biocLite* install command. 
+The R software for running bioassayR can be downloaded from CRAN (<http://cran.at.r-project.org/>). The *bioassayR* package can be installed from R using the *BiocManager* package. 
 
 ```{r eval=FALSE}
-source("http://bioconductor.org/biocLite.R") # Sources the biocLite.R installation script
-biocLite("bioassayR") # Installs the package
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("bioassayR")
 ```
 
 Loading the Package and Documentation
@@ -110,7 +113,7 @@ First, create a new database. For purposes of this manual a temporary file is us
 ```{r eval=TRUE, tidy=FALSE}
 library(bioassayR)
 myDatabaseFilename <- tempfile() 
-mydb <- newBioassayDB(myDatabaseFilename, indexed=F)
+mydb <- newBioassayDB(myDatabaseFilename, indexed=FALSE)
 ```
 
 Next, specify the source and version of the data you plan to load. This is a required step, which makes it easier to track the origin of your data later. Feel free to use the current date for a version number, if your data isn't versioned.
@@ -346,7 +349,7 @@ consult the *biomaRt* documentation. After retrieving these data, we call the
 library(biomaRt)
 ensembl <- useEnsembl(biomart="ensembl",dataset="hsapiens_gene_ensembl")
 proteinDetails <- getBM(attributes=c("description","uniprot_swissprot","external_gene_name"), filters=c("uniprot_swissprot"), mart=ensembl, values=uniProtIds)
-proteinDetails <- proteinDetails[match(uniProtIds, proteinDetails$uniprot_swissprot),]
+# proteinDetails <- proteinDetails[match(uniProtIds, proteinDetails$uniprot_swissprot),]
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE}
@@ -354,11 +357,11 @@ proteinDetails <- proteinDetails[match(uniProtIds, proteinDetails$uniprot_swissp
 # NOTE: this must match the code in the previous code chunk but will be
 #   hidden. Delete cacheFileName to rebuild the cache from web data.
 cacheFileName <- "getBM.RData"
-if(! file.exists(cacheFileName)){
+if(!file.exists(cacheFileName)){
     library(biomaRt)
     ensembl <- useEnsembl(biomart="ensembl",dataset="hsapiens_gene_ensembl")
-    proteinDetails <- getBM(attributes=c("description","uniprot_swissprot","external_gene_name"), filters=c("uniprot_swissprot"), mart=ensembl, values=uniProtIds)
-    proteinDetails <- proteinDetails[match(uniProtIds, proteinDetails$uniprot_swissprot),]
+    proteinDetails <- getBM(attributes=c("description","uniprotswissprot","external_gene_name"), filters=c("uniprotswissprot"), mart=ensembl, values=uniProtIds)
+    proteinDetails <- proteinDetails[match(uniProtIds, proteinDetails$uniprotswissprot),]
     save(list=c("proteinDetails"), file=cacheFileName)
 }
 load(cacheFileName)
@@ -442,7 +445,7 @@ structures <- getIds(as.numeric(row.names(selectiveCompounds)))
 #   hidden. Delete cacheFileName to rebuild the cache from web data.
 library(ChemmineR)
 cacheFileName <- "getids.RData"
-if(! file.exists(cacheFileName)){
+if(!file.exists(cacheFileName)){
     structures <- getIds(as.numeric(row.names(selectiveCompounds)))
     save(list=c("structures"), file=cacheFileName)
 }
