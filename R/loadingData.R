@@ -34,18 +34,18 @@ newBioassayDB <- function(databasePath, writeable = TRUE, indexed = FALSE){
 
     drv <- dbDriver("SQLite")
     con <- dbConnect(drv, dbname=databasePath)
-    dbExecute(con, paste("CREATE TABLE activity",
+    dbGetQuery(con, paste("CREATE TABLE activity",
         "(aid INTEGER, cid INTEGER,",
         "activity INTEGER, score REAL)"))
-    dbExecute(con, paste("CREATE TABLE assays",
+    dbGetQuery(con, paste("CREATE TABLE assays",
         "(source_id INTEGER, aid INTEGER,",
         "assay_type TEXT, organism TEXT, scoring TEXT)"))
-    dbExecute(con, paste("CREATE TABLE sources",
+    dbGetQuery(con, paste("CREATE TABLE sources",
         "(source_id INTEGER PRIMARY KEY ASC,",
         "description TEXT, version TEXT)"))
-    dbExecute(con, paste("CREATE TABLE targets",
+    dbGetQuery(con, paste("CREATE TABLE targets",
         "(aid INTEGER, target TEXT, target_type TEXT)"))
-    dbExecute(con, paste("CREATE TABLE targetTranslations",
+    dbGetQuery(con, paste("CREATE TABLE targetTranslations",
         "(target TEXT, category TEXT, identifier TEXT)"))
     dbDisconnect(con)
     database <- connectBioassayDB(databasePath, writeable = TRUE)
